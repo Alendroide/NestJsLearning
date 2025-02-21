@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTask } from './tasks-dto/create-task.dto';
-import { TasksGuard } from './tasks.guard';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('tasks')
 export class TasksController {
@@ -13,7 +13,7 @@ export class TasksController {
     }
 
     @Get()
-    @UseGuards(TasksGuard)
+    @UseGuards(AuthGuard)
     index(@Query('page') queryPage ){
         if(!queryPage) return this.tasksService.getAll();
         const page = parseInt(queryPage);
@@ -23,25 +23,25 @@ export class TasksController {
     }
 
     @Get('/:id')
-    @UseGuards(TasksGuard)
+    @UseGuards(AuthGuard)
     getById(@Param('id', ParseIntPipe) id : number){
         return this.tasksService.getById(id);
     }
 
     @Post()
-    @UseGuards(TasksGuard)
+    @UseGuards(AuthGuard)
     create(@Body() task : CreateTask){
         return this.tasksService.create(task)
     }
 
     @Put('/:id')
-    @UseGuards(TasksGuard)
+    @UseGuards(AuthGuard)
     update(@Param('id',ParseIntPipe) id : number, @Body() task : CreateTask ){
         return this.tasksService.update(id,task);
     }
 
     @Delete('/:id')
-    @UseGuards(TasksGuard)
+    @UseGuards(AuthGuard)
     delete(@Param('id',ParseIntPipe) id : number){
         return this.tasksService.destroy(id);
     }
