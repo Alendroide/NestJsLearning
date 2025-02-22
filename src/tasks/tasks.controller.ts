@@ -14,12 +14,12 @@ export class TasksController {
 
     @Get()
     @UseGuards(AuthGuard)
-    index(@Query('page') queryPage ){
+    index(@Query('page') queryPage, @Query('title') title : string | undefined ){
         if(!queryPage) return this.tasksService.getAll();
         const page = parseInt(queryPage);
         if(isNaN(page)) return new HttpException("Invalid query",HttpStatus.BAD_REQUEST);
         if(page < 0) return new HttpException("Query must be a positive number",HttpStatus.BAD_REQUEST);
-        return this.tasksService.getAll(page);
+        return this.tasksService.getAll(page,title);
     }
 
     @Get('/:id')

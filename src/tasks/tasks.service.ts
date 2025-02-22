@@ -9,11 +9,19 @@ export class TasksService {
     prisma : PrismaClient = new PrismaClient();
     configService : ConfigService = new ConfigService;
 
-    async getAll(page = 1){
+    async getAll(page = 1, title? : string){
         const skip = (page-1) * 10;
         const tasks = await this.prisma.task.findMany({
             take : parseInt(this.configService.get<string>("TAKESKIP") as string),
-            skip
+            skip,
+            orderBy : {
+                id : "desc"
+            },
+            where : title? {
+                title : {
+                    contains : title,
+                }
+            } : undefined
         });
         return tasks;
     }
