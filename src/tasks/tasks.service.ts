@@ -9,7 +9,14 @@ export class TasksService {
     prisma : PrismaClient = new PrismaClient();
     configService : ConfigService = new ConfigService;
 
-    async getAll(page = 1, title? : string){
+    async getAll(page = 1, title? : string, done? : string){
+        
+        //Esto añade dinamicamente las condiciones de haberlas
+        const conditions : { [key: string]: any } = {};
+        if(done !== undefined) conditions["done"] = done;
+        if(title !== undefined && title !== "") conditions["title"] = { contains : title};
+        
+        //Define cuántas tasks se van a saltar dependiendo la página
         const skip = (page-1) * 10;
         const tasks = await this.prisma.task.findMany({
             take : parseInt(this.configService.get<string>("TAKESKIP") as string),
@@ -17,11 +24,7 @@ export class TasksService {
             orderBy : {
                 id : "desc"
             },
-            where : title? {
-                title : {
-                    contains : title,
-                }
-            } : undefined
+            where : conditions
         });
         return tasks;
     }

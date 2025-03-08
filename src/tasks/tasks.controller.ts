@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseBoolPipe, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTask } from './tasks-dto/create-task.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -14,12 +14,13 @@ export class TasksController {
 
     @Get()
     @UseGuards(AuthGuard)
-    index(@Query('page') queryPage, @Query('title') title : string | undefined ){
+    index(@Query('page') queryPage, @Query('title') title : string | undefined, @Query('done') done : string | undefined | boolean){
         if(!queryPage) return this.tasksService.getAll();
         const page = parseInt(queryPage);
         if(isNaN(page)) return new HttpException("Invalid query",HttpStatus.BAD_REQUEST);
         if(page < 0) return new HttpException("Query must be a positive number",HttpStatus.BAD_REQUEST);
-        return this.tasksService.getAll(page,title);
+        if(done !== undefined) done = done === "true" ? true : false;
+        return this.tasksService.getAll(page,title,done);
     }
 
     @Get('/:id')
